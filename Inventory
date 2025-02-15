@@ -1,30 +1,44 @@
 async function fetchGlasses() {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxIuaCCN9qkDxxMO8uBrIwkP-8NNo378zTcns1kiNSf6uZKchBkOpGDK6d-6qQ9p_BkSg/exec"); 
-    const data = await response.json();
-    
-    let table = `<table border="1">
-        <tr>
-            <th>Frame Color</th>
-            <th>Lens Type</th>
-            <th>Right Sphere</th>
-            <th>Left Sphere</th>
-            <th>Image</th>
-            <th>Request</th>
-        </tr>`;
-    
-    data.forEach(item => {
-        table += `<tr>
-            <td>${item["Frame Color"]}</td>
-            <td>${item["Lens Type"]}</td>
-            <td>${item["Right Lens Sphere"]}</td>
-            <td>${item["Left Lens Sphere"]}</td>
-            <td><img src="${item["Image"]}" width="100"></td>
-            <td><button onclick="requestGlasses('${item["Frame Color"]}', '${item["Lens Type"]}')">Request</button></td>
-        </tr>`;
-    });
+    console.log("Fetching glasses inventory..."); // Debugging log
 
-    table += `</table>`;
-    document.getElementById("inventory").innerHTML = table;
+    try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxIuaCCN9qkDxxMO8uBrIwkP-8NNo378zTcns1kiNSf6uZKchBkOpGDK6d-6qQ9p_BkSg/exec");
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        console.log("Response received:", response); // Debugging log
+        const data = await response.json();
+        console.log("Data parsed:", data); // Debugging log
+
+        let table = `<table border="1">
+            <tr>
+                <th>Frame Color</th>
+                <th>Lens Type</th>
+                <th>Right Sphere</th>
+                <th>Left Sphere</th>
+                <th>Image</th>
+                <th>Request</th>
+            </tr>`;
+
+        data.forEach(item => {
+            table += `<tr>
+                <td>${item["Frame Color"]}</td>
+                <td>${item["Lens Type"]}</td>
+                <td>${item["Right Lens Sphere"]}</td>
+                <td>${item["Left Lens Sphere"]}</td>
+                <td><img src="${item["Image"]}" width="100"></td>
+                <td><button onclick="requestGlasses('${item["Frame Color"]}', '${item["Lens Type"]}')">Request</button></td>
+            </tr>`;
+        });
+
+        table += `</table>`;
+        document.getElementById("inventory").innerHTML = table;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        document.getElementById("inventory").innerHTML = "<p>Error loading inventory. Check console for details.</p>";
+    }
 }
 
 window.onload = fetchGlasses;
